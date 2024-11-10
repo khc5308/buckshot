@@ -15,7 +15,13 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 background = pygame.image.load("./image/back.png")
 #아이템
 tmp_img = pygame.image.load("./image/tmp.png")
+doll = pygame.image.load("./image/item/doll.png")
+gift = pygame.image.load("./image/item/gift.png")
 glasses = pygame.image.load("./image/item/glasses.png")
+jusagi = pygame.image.load("./image/item/jusagi.png")
+pill = pygame.image.load("./image/item/pill.png")
+saw = pygame.image.load("./image/item/saw.png")
+smoke = pygame.image.load("./image/item/smoke.png")
 
 
 item_pos_1=(720,770)
@@ -46,14 +52,19 @@ while running:
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
+            print(event.pos)
             if click_zone_1.collidepoint(event.pos):
-                Use_itme(player,1)
+                Use_itme(player,0)
+                print(0)
             elif click_zone_2.collidepoint(event.pos):
-                Use_itme(player,2)
+                Use_itme(player,1)
+                print(1)
             elif click_zone_3.collidepoint(event.pos):
-                Use_itme(player,3)
+                Use_itme(player,2)
+                print(2)
             elif click_zone_4.collidepoint(event.pos):
-                Use_itme(player,4)
+                Use_itme(player,3)
+                print(3)
             else:
                 print("아무곳")
     
