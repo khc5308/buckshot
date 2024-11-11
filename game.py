@@ -68,6 +68,10 @@ while running:
             else:
                 print("아무곳")
     
+
+
+
+    
     # 화면 업데이트
     pygame.display.update()
 

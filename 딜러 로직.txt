@@ -16,3 +16,13 @@
 # 변환기   : 공탄 
 # 돋보기   : 실탄
 # 쇠톱     : 실탄
+
+
+
+doll
+gift
+glasses
+jusagi
+pill
+saw
+smoke
