@@ -22,8 +22,9 @@ gun = Shotgun()
 player.Name="Player"
 dealer.Name="Dealer"
 
-Items = ["doll", "gift", "glasses", "jusagi", "pill", "saw", "smoke"]
- 
+Items_di = ["doll", "gift", "glasses", "jusagi", "pill", "saw", "smoke"]
+
+
 def game_start():
 
     #shell 갯수,실탄,공탄 갯수 랜덤 설정
@@ -52,58 +53,61 @@ def game_start():
                 gun.shell.append(0)
 
     #hp 뽑기
-    num_hp = random.randint(2,5)
+    num_hp = random.randint(2,4)
 
     player.max_hp = player.hp = num_hp
     dealer.max_hp = dealer.hp = num_hp
 
 
-def Use_itme(character,slot:int):
+def Use_itme(character:Character,slot:int):
     item_name = character.item[slot]
+    character.item[slot] = " "
+    match item_name:
+        case "doll":
+            doll(character,slot)
+        case "gift":
+            gift(character,slot)
+        case "glasses":
+            glasses(character,slot)
+        case "jusagi":
+            jusagi(character,slot)
+        case "pill":
+            pill(character,slot)
+        case "saw":
+            saw(slot)
+        case "smoke":
+            smoke(character,slot)    
 
-    if item_name == "doll":
-        doll()
-    elif item_name == "gift":
-        gift()
-    elif item_name == "glasses":
-        glasses()
-    elif item_name == "jusagi":
-        jusagi()
-    elif item_name == "pill":
-        pill(character)
-    elif item_name == "saw":
-        saw()
-    elif item_name == "smoke":
-        smoke(character)
-    else:
-        pass
 
-
-# 애니메이션, 효과 추가할 것
-def doll():
-    gun.shell.pop()
-
-def gift(character,slot:int):
-    a = int(input("0~6 : "))
-    character.item[slot] = Items[a]
-
-def glasses():
-    print(gun.shell[1])
-
-def jusagi():
+def move_item(character:Character,slot:int):
     pass
 
-def pill(character):
+def doll(character:Character,slot:int):
+    gun.shell.pop()
+
+def gift(character:Character,slot:int):
+    a = int(input("0~6 : "))
+    # character.item[slot] = [Items_a_di]
+
+def glasses(character:Character,slot:int):
+    print(gun.shell[1])
+
+def jusagi(character:Character,slot:int):
+    pass
+
+def pill(character:Character,slot:int):
     if random.randint(0,1):
         character.hp += 2
     else:
         character.hp -= 1
-    
     if character.hp > character.max_hp:
         character.hp = character.max_hp
 
-def saw():
+def saw(slot:int):
     gun.saw = True
 
-def smoke(character):
+def smoke(character:Character,slot:int):
     character.hp += 1
+
+def dealer_use_item(character:Character,slot:int):
+    pass
