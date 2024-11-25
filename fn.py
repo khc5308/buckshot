@@ -9,16 +9,26 @@ class Character:
         self.issugap = False
         self.adrenaline = False
 
+
+
 class Shotgun:
-    saw = False
-    shell = []
-    total_num = 0
-    real_num = 0
-    fake_num = 0
+    def __init__(self):
+        self.saw = False
+        self.shell = []
+        self.total_num = 0
+        self.real_num = 0
+        self.fake_num = 0
+
+class GameSetting:
+    def __init__(self):
+        self.round = -1
+        self.isPlayerTurn = True
+        
 
 player = Character()
 dealer = Character()
 gun = Shotgun()
+game = GameSetting()
 
 player.Name="Player"
 dealer.Name="Dealer"
@@ -28,12 +38,9 @@ round = -1
 
 
 def round_start():
-    global round
 
-    print("round : ",round)
     reset_shell()
-    round += 1
-    print("round : ",round)
+    game.round += 1
 
     #hp 뽑기
     num_hp = random.randint(2,4)
@@ -45,7 +52,6 @@ def round_start():
     print("gun.num_real",gun.real_num)
     print("gun.num_fake",gun.fake_num)
     print("gun.shell",gun.shell)
-    print("round",round)
 
 def reset_shell():
 
@@ -142,16 +148,14 @@ def dealer_use_item(character:Character,slot:int):
 #endregion
 
 
-turn = player.Name
 def shoot(character:Character):
-    global turn
-    print(turn)
 
     if gun.shell[-1]:
         character.hp -= 1
 
-    if not (turn == character.Name and not gun.shell[-1]):
-        turn = dealer.Name if turn != dealer.Name else player.Name
+    turn = game.isPlayerTurn
+    if not((character.Name == "Player" and turn) or (character.Name == "Dealer" and not turn)):
+        game.isPlayerTurn = 0 if turn else 1
 
     
     gun.shell.pop()

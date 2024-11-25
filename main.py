@@ -1,8 +1,7 @@
 import pygame
 import random
 from fn import round_start, Use_itme, shoot, reset_shell
-from fn import gun, player, dealer
-from fn import turn, round
+from fn import gun, player, dealer, game
 
 pygame.init()
 round_start()
@@ -41,14 +40,8 @@ dot = pygame.image.load("./image/dot.png")
 #endregion 
 
 #region pos 설정
-item_pos_1=(720 ,770)
-item_pos_2=(840 ,770)
-item_pos_3=(960 ,770)
-item_pos_4=(1080,770)
-item_pos_5=(720 ,180)
-item_pos_6=(840 ,180)
-item_pos_7=(960 ,180)
-item_pos_8=(1080,180)
+
+item_pos = [(720 ,770),(840 ,770),(960 ,770),(1080,770),(720 ,180),(840 ,180),(960 ,180),(1080,180)]
 
 gun_pos = (625, 180)
 
@@ -126,7 +119,8 @@ while running:
                 shoot_ready = False
             else:
                 print("None")
-        elif turn == player.Name or turn == dealer.Name:
+
+        elif game.isPlayerTurn:
             if click_zone_1.collidepoint(event.pos):
                 Use_itme(player,0)
                 print("0번 아이템 사용")
@@ -170,19 +164,14 @@ while running:
         pass
         # screen.blit()
 
-    screen.blit(dot, round_dot[round])
+    screen.blit(dot, round_dot[game.round])
 
-    #region heart 그리기
+    #region heart, shell 그리기
     for i in range(player.max_hp):
-        if i < player.hp:
-            screen.blit(heart, heart_pos_player[i])
-        else:
-            screen.blit(heart_break, heart_pos_player[i])
+        screen.blit(heart if i < player.hp else heart_break, heart_pos_player[i])
+
     for i in range(dealer.max_hp):
-        if i < dealer.hp:
-            screen.blit(heart, heart_pos_dealer[i])
-        else:
-            screen.blit(heart_break, heart_pos_dealer[i])
+        screen.blit(heart if i < dealer.hp else heart_break, heart_pos_dealer[i])
 
     for i in range(1,len(gun.shell)+1):
         screen.blit(real if gun.shell[-i] else fake, shell_pos[i-1])
@@ -191,15 +180,15 @@ while running:
     #region 아이템 그리기
 
     #player
-    screen.blit(Items_di[player.item[0]], item_pos_1)
-    screen.blit(Items_di[player.item[1]], item_pos_2)
-    screen.blit(Items_di[player.item[2]], item_pos_3)
-    screen.blit(Items_di[player.item[3]], item_pos_4)
+    screen.blit(Items_di[player.item[0]], item_pos[0])
+    screen.blit(Items_di[player.item[1]], item_pos[1])
+    screen.blit(Items_di[player.item[2]], item_pos[2])
+    screen.blit(Items_di[player.item[3]], item_pos[3])
     #dealer
-    screen.blit(Items_di[dealer.item[0]], item_pos_5)
-    screen.blit(Items_di[dealer.item[1]], item_pos_6)
-    screen.blit(Items_di[dealer.item[2]], item_pos_7)
-    screen.blit(Items_di[dealer.item[3]], item_pos_8)
+    screen.blit(Items_di[dealer.item[0]], item_pos[4])
+    screen.blit(Items_di[dealer.item[1]], item_pos[5])
+    screen.blit(Items_di[dealer.item[2]], item_pos[6])
+    screen.blit(Items_di[dealer.item[3]], item_pos[7])
 
     #endregion
 
@@ -208,7 +197,6 @@ while running:
     
     if player.hp <= 0 or dealer.hp <= 0:
         round_start()
-        print("round : ada",round)
 
     pygame.display.update() # 화면 업데이트
 
