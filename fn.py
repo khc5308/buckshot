@@ -1,12 +1,13 @@
 import random
 
 class Character:
-    Name = ""
-    item = [" "," "," "," "]
-    max_hp = 4
-    hp = 4
-    issugap = False
-    adrenaline = False
+    def __init__(self):
+        self.Name = ""
+        self.item = [" "]*4
+        self.max_hp = 4
+        self.hp = 4
+        self.issugap = False
+        self.adrenaline = False
 
 class Shotgun:
     saw = False
@@ -23,12 +24,35 @@ player.Name="Player"
 dealer.Name="Dealer"
 
 Items_di = ["doll", "gift", "glasses", "jusagi", "pill", "saw", "smoke"]
+round = -1
 
 
-def game_start():
+def round_start():
+    global round
+
+    print("round : ",round)
+    reset_shell()
+    round += 1
+    print("round : ",round)
+
+    #hp 뽑기
+    num_hp = random.randint(2,4)
+
+    player.max_hp = player.hp = num_hp
+    dealer.max_hp = dealer.hp = num_hp
+
+    print("gun.total_num",gun.total_num)
+    print("gun.num_real",gun.real_num)
+    print("gun.num_fake",gun.fake_num)
+    print("gun.shell",gun.shell)
+    print("round",round)
+
+def reset_shell():
+
+    gun.shell = []
 
     #shell 갯수,실탄,공탄 갯수 랜덤 설정
-    num_shell = random.randint(2,9)
+    num_shell = random.randint(2,8)
     num_real = random.randint(1,num_shell-1)
     num_fake = num_shell - num_real
  
@@ -52,12 +76,6 @@ def game_start():
             else:
                 gun.shell.append(0)
 
-    #hp 뽑기
-    num_hp = random.randint(2,4)
-
-    player.max_hp = player.hp = num_hp
-    dealer.max_hp = dealer.hp = num_hp
-
 
 def Use_itme(character:Character,slot:int):
     item_name = character.item[slot]
@@ -76,12 +94,18 @@ def Use_itme(character:Character,slot:int):
         case "saw":
             saw(slot)
         case "smoke":
-            smoke(character,slot)    
+            smoke(character,slot)   
+    
+    if item_name != "jusagi" and character.Name == "Dealer":
+        print("off adrenaline")
+        player.adrenaline = False 
 
 
 def move_item(character:Character,slot:int):
     pass
 
+
+#region item 사용 함수
 def doll(character:Character,slot:int):
     gun.shell.pop()
 
@@ -93,7 +117,10 @@ def glasses(character:Character,slot:int):
     print(gun.shell[1])
 
 def jusagi(character:Character,slot:int):
-    pass
+    if (player.adrenaline or dealer.adrenaline):
+        character.item[slot] = "jusagi"
+    else:
+        character.adrenaline = True
 
 def pill(character:Character,slot:int):
     if random.randint(0,1):
@@ -111,3 +138,21 @@ def smoke(character:Character,slot:int):
 
 def dealer_use_item(character:Character,slot:int):
     pass
+
+#endregion
+
+
+turn = player.Name
+def shoot(character:Character):
+    global turn
+    print(turn)
+
+    if gun.shell[-1]:
+        character.hp -= 1
+
+    if not (turn == character.Name and not gun.shell[-1]):
+        turn = dealer.Name if turn != dealer.Name else player.Name
+
+    
+    gun.shell.pop()
+    
