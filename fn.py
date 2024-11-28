@@ -21,55 +21,55 @@ class GameSetting:
     def __init__(self):
         self.round = -1
         self.isPlayerTurn = True
+
+font = pygame.font.Font("./fonts/PretendardVariable.ttf", 36)
+class img:
+    def __init__(self):
+        self.background = pygame.image.load("./image/back.png")
+        # 총 (45)
+        self.gun_45 = pygame.image.load("./image/gun/gun45.png")
+        self.saw_gun = pygame.image.load("./image/gun/sawed.png")
+
+        # 총 (90)
+        self.gun_90 = pygame.image.load("./image/gun/gun90.png")
+
+        #아이템
+        self.tmp_img = pygame.image.load("./image/item/tmp.png")
+        self.doll = pygame.image.load("./image/item/doll.png")
+        self.gift = pygame.image.load("./image/item/gift.png")
+        self.glasses = pygame.image.load("./image/item/glasses.png")
+        self.jusagi = pygame.image.load("./image/item/jusagi.png")
+        self.pill = pygame.image.load("./image/item/pill.png")
+        self.saw = pygame.image.load("./image/item/saw.png")
+        self.smoke = pygame.image.load("./image/item/smoke.png")
+        #하트
+        self.heart = pygame.image.load("./image/heart/heart1.png")
+        self.heart_break = pygame.image.load("./image/heart/heart0.png")
+        #탄약
+        self.real = pygame.image.load("./image/shell/real.png")
+        self.fake = pygame.image.load("./image/shell/fake.png")
+
+        #글자
+        self.Text_Dealer = font.render("Dealer", True, (255,255,255))
+        self.Text_Player = font.render("Player", True, (255,255,255))
+
+        self.light = pygame.image.load("./image/light.png")
+
+        self.dot = pygame.image.load("./image/dot.png")
+
         
 
 player = Character()
 dealer = Character()
 gun = Shotgun()
 game = GameSetting()
+image = img()
 
 player.Name="Player"
 dealer.Name="Dealer"
 
 round = -1
 
-image ={
-
-    background = pygame.image.load("./image/back.png")
-    # 총 (45)
-    gun_45 = pygame.image.load("./image/gun/gun45.png")
-    saw_gun = pygame.image.load("./image/gun/sawed.png")
-    saw_gun = pygame.transform.scale(saw_gun, (gun_45.get_width() ,gun_45.get_height()))
-
-    # 총 (90)
-    gun_90 = pygame.image.load("./image/gun/gun90.png")
-
-    #아이템
-    tmp_img = pygame.image.load("./image/item/tmp.png")
-    doll = pygame.image.load("./image/item/doll.png")
-    gift = pygame.image.load("./image/item/gift.png")
-    glasses = pygame.image.load("./image/item/glasses.png")
-    jusagi = pygame.image.load("./image/item/jusagi.png")
-    pill = pygame.image.load("./image/item/pill.png")
-    saw = pygame.image.load("./image/item/saw.png")
-    smoke = pygame.image.load("./image/item/smoke.png")
-    #하트
-    heart = pygame.image.load("./image/heart/heart1.png")
-    heart_break = pygame.image.load("./image/heart/heart0.png")
-    #탄약
-    real = pygame.image.load("./image/shell/real.png")
-    fake = pygame.image.load("./image/shell/fake.png")
-
-    #글자
-    font = pygame.font.Font("./fonts/PretendardVariable.ttf", 36)
-    Text_Dealer = font.render("Dealer", True, (255,255,255))
-    Text_Player : font.render("Player", True, (255,255,255))
-
-    light : pygame.image.load("./image/light.png")
-
-    #글자
-    "dot" : pygame.image.load("./image/dot.png")
-}
 
 def round_start():
 
