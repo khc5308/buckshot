@@ -1,4 +1,4 @@
-import random
+import pygame,random, time
 
 class Character:
     def __init__(self):
@@ -8,8 +8,6 @@ class Character:
         self.hp = 4
         self.issugap = False
         self.adrenaline = False
-
-
 
 class Shotgun:
     def __init__(self):
@@ -33,9 +31,45 @@ game = GameSetting()
 player.Name="Player"
 dealer.Name="Dealer"
 
-Items_di = ["doll", "gift", "glasses", "jusagi", "pill", "saw", "smoke"]
 round = -1
 
+image ={
+
+    background = pygame.image.load("./image/back.png")
+    # 총 (45)
+    gun_45 = pygame.image.load("./image/gun/gun45.png")
+    saw_gun = pygame.image.load("./image/gun/sawed.png")
+    saw_gun = pygame.transform.scale(saw_gun, (gun_45.get_width() ,gun_45.get_height()))
+
+    # 총 (90)
+    gun_90 = pygame.image.load("./image/gun/gun90.png")
+
+    #아이템
+    tmp_img = pygame.image.load("./image/item/tmp.png")
+    doll = pygame.image.load("./image/item/doll.png")
+    gift = pygame.image.load("./image/item/gift.png")
+    glasses = pygame.image.load("./image/item/glasses.png")
+    jusagi = pygame.image.load("./image/item/jusagi.png")
+    pill = pygame.image.load("./image/item/pill.png")
+    saw = pygame.image.load("./image/item/saw.png")
+    smoke = pygame.image.load("./image/item/smoke.png")
+    #하트
+    heart = pygame.image.load("./image/heart/heart1.png")
+    heart_break = pygame.image.load("./image/heart/heart0.png")
+    #탄약
+    real = pygame.image.load("./image/shell/real.png")
+    fake = pygame.image.load("./image/shell/fake.png")
+
+    #글자
+    font = pygame.font.Font("./fonts/PretendardVariable.ttf", 36)
+    Text_Dealer = font.render("Dealer", True, (255,255,255))
+    Text_Player : font.render("Player", True, (255,255,255))
+
+    light : pygame.image.load("./image/light.png")
+
+    #글자
+    "dot" : pygame.image.load("./image/dot.png")
+}
 
 def round_start():
 
@@ -58,7 +92,7 @@ def reset_shell():
     gun.shell = []
 
     #shell 갯수,실탄,공탄 갯수 랜덤 설정
-    num_shell = random.randint(2,8)
+    num_shell= random.randint(2,8)
     num_real = random.randint(1,num_shell-1)
     num_fake = num_shell - num_real
  
@@ -120,7 +154,7 @@ def gift(character:Character,slot:int):
     # character.item[slot] = [Items_a_di]
 
 def glasses(character:Character,slot:int):
-    print(gun.shell[1])
+    print(gun.shell[-1])
 
 def jusagi(character:Character,slot:int):
     if (player.adrenaline or dealer.adrenaline):
@@ -157,6 +191,7 @@ def shoot(character:Character):
     if not((character.Name == "Player" and turn) or (character.Name == "Dealer" and not turn)):
         game.isPlayerTurn = 0 if turn else 1
 
+    gun.saw = False
     
     gun.shell.pop()
     

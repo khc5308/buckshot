@@ -1,5 +1,5 @@
 import pygame
-import random
+import random,time
 from fn import round_start, Use_itme, shoot, reset_shell
 from fn import gun, player, dealer, game
 
@@ -12,6 +12,12 @@ round_start()
 background = pygame.image.load("./image/back.png")
 # 총 (45)
 gun_45 = pygame.image.load("./image/gun/gun45.png")
+saw_gun = pygame.image.load("./image/gun/sawed.png")
+saw_gun = pygame.transform.scale(saw_gun, (gun_45.get_width() ,gun_45.get_height()))
+
+# 총 (90)
+gun_90 = pygame.image.load("./image/gun/gun90.png")
+
 #아이템
 tmp_img = pygame.image.load("./image/item/tmp.png")
 doll = pygame.image.load("./image/item/doll.png")
@@ -33,6 +39,8 @@ font = pygame.font.Font("./fonts/PretendardVariable.ttf", 36)
 Text_Dealer = font.render("Dealer", True, (255,255,255))
 Text_Player = font.render("Player", True, (255,255,255))
 
+light = pygame.image.load("./image/light.png")
+
 #글자
 dot = pygame.image.load("./image/dot.png")
 
@@ -52,14 +60,16 @@ heart_pos_dealer = [(1209,460),(1225,460),(1241,460),(1257,460)]
 #endregion
 
 #region click_zone 설정
-click_zone_1 = pygame.Rect(720, 770, tmp_img.get_width(), tmp_img.get_height())
-click_zone_2 = pygame.Rect(840, 770, tmp_img.get_width(), tmp_img.get_height())
-click_zone_3 = pygame.Rect(960, 770, tmp_img.get_width(), tmp_img.get_height())
-click_zone_4 = pygame.Rect(1080,770, tmp_img.get_width(), tmp_img.get_height())
-click_zone_5 = pygame.Rect(720, 180, tmp_img.get_width(), tmp_img.get_height())
-click_zone_6 = pygame.Rect(840, 180, tmp_img.get_width(), tmp_img.get_height())
-click_zone_7 = pygame.Rect(960, 180, tmp_img.get_width(), tmp_img.get_height())
-click_zone_8 = pygame.Rect(1080,180, tmp_img.get_width(), tmp_img.get_height())
+Tmp_width =  tmp_img.get_width()
+Tmp_height =  tmp_img.get_height()
+click_zone_1 = pygame.Rect(720, 770, Tmp_width, Tmp_height)
+click_zone_2 = pygame.Rect(840, 770, Tmp_width, Tmp_height)
+click_zone_3 = pygame.Rect(960, 770, Tmp_width, Tmp_height)
+click_zone_4 = pygame.Rect(1080,770, Tmp_width, Tmp_height)
+click_zone_5 = pygame.Rect(720, 180, Tmp_width, Tmp_height)
+click_zone_6 = pygame.Rect(840, 180, Tmp_width, Tmp_height)
+click_zone_7 = pygame.Rect(960, 180, Tmp_width, Tmp_height)
+click_zone_8 = pygame.Rect(1080,180, Tmp_width, Tmp_height)
 
 click_zone_gun = pygame.Rect(625, 180,gun_45.get_width(), gun_45.get_height())
 
@@ -73,11 +83,16 @@ click_zone_dealerText = pygame.Rect(907,680, Text_Player.get_width(), Text_Playe
 running = True
 shoot_ready = False
 gift_ready = False
-round_dot = [(1219,545)]
+
+move_gun = True
+
+round_dot = [(1219,543),(1239,543),(1262,543)]
+
 Items_di = {" ":tmp_img, "doll":doll, "gift":gift, "glasses":glasses, "jusagi":jusagi, "pill":pill, "saw":saw, "smoke":smoke}
 items_name = list(Items_di.keys())
-screen_width, screen_height = 1920, 1080 
 
+screen_width, screen_height = 1920, 1080 
+gun_angle = 0
 
 screen = pygame.display.set_mode((screen_width, screen_height))
 
@@ -92,16 +107,35 @@ dealer.item[2] = items_name[random.randint(1,len(items_name)-1)]
 dealer.item[3] = items_name[random.randint(1,len(items_name)-1)]
 
 # 메인 루프
+clock = pygame.time.Clock()
+
+
 while running:
-    # 배경 그리기
+
     screen.blit(background, (0, 0))
-    screen.blit(gun_45, (625, 180))
 
     # 이벤트 get
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
             break
+
+        elif event.type == pygame.KEYDOWN:
+            match(event.key):
+                case pygame.K_F1:
+                    player.item[0] = items_name[0]
+                    player.item[1] = items_name[1]
+                    player.item[2] = items_name[2]
+                    player.item[3] = items_name[3]
+                case pygame.K_F2:
+                    player.item[0] = items_name[4]
+                    player.item[1] = items_name[5]
+                    player.item[2] = items_name[6]
+                    player.item[3] = items_name[7]       
+                case pygame.K_r:
+                    game.round += 1             
+                    game.round %= 3
+
 
         if event.type != pygame.MOUSEBUTTONDOWN:
             continue
@@ -120,7 +154,7 @@ while running:
             else:
                 print("None")
 
-        elif game.isPlayerTurn:
+        elif game.isPlayerTurn or not game.isPlayerTurn:
             if click_zone_1.collidepoint(event.pos):
                 Use_itme(player,0)
                 print("0번 아이템 사용")
@@ -160,6 +194,7 @@ while running:
         screen.blit(Text_Player, (907,680))
     #endregion
 
+    
     if gift_ready:
         pass
         # screen.blit()
@@ -192,12 +227,38 @@ while running:
 
     #endregion
 
+    #region 총 애니메이션
+    angle = 0
+    if shoot_ready:
+        print("gun_angle : ",gun_angle)
+        if move_gun:
+            print("1234")
+            gun_angle-=1
+            rotated_image = pygame.transform.rotate(gun_45, gun_angle)
+            screen.blit(rotated_image, rotated_image.get_rect(center=gun_45.get_rect(topleft=gun_pos).center).topleft)
+        else:
+            screen.blit(gun_90,gun_pos)
+
+        if gun_angle < -45:
+            move_gun = False
+    else:
+        screen.blit(saw_gun if gun.saw else gun_45 , (625, 180))
+
+
+    #endregion
+
+
     if not gun.shell:
         reset_shell()
     
     if player.hp <= 0 or dealer.hp <= 0:
         round_start()
 
+    # 배경 그리기
+    screen.blit(light, (screen_width//2 - 700, 0))
+
+
+    clock.tick(300)
     pygame.display.update() # 화면 업데이트
 
 pygame.quit()   
