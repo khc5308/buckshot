@@ -1,9 +1,9 @@
 import pygame
 import random,time
 pygame.init()
-from fn import round_start, Use_itme, shoot, reset_shell, determine #함수
+from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item #함수
 from fn import gun, player, dealer, image, game #class
-from fn import screen
+from fn import screen, click_zone
 
 
 round_start()
@@ -23,16 +23,6 @@ heart_pos_dealer = [(1209,460),(1225,460),(1241,460),(1257,460)]
 #endregion
 
 #region click_zone 설정
-Tmp_width =  image.tmp_img.get_width()
-Tmp_height =  image.tmp_img.get_height()
-click_zone_1 = pygame.Rect(720, 778, Tmp_width, Tmp_height)
-click_zone_2 = pygame.Rect(840, 778, Tmp_width, Tmp_height)
-click_zone_3 = pygame.Rect(960, 778, Tmp_width, Tmp_height)
-click_zone_4 = pygame.Rect(1080,778, Tmp_width, Tmp_height)
-click_zone_5 = pygame.Rect(720, 180, Tmp_width, Tmp_height)
-click_zone_6 = pygame.Rect(840, 180, Tmp_width, Tmp_height)
-click_zone_7 = pygame.Rect(960, 180, Tmp_width, Tmp_height)
-click_zone_8 = pygame.Rect(1080,180, Tmp_width, Tmp_height)
 
 click_zone_gun = pygame.Rect(625, 180,image.gun_45.get_width(), image.gun_45.get_height())
 
@@ -135,16 +125,16 @@ while running:
                 print("None")
 
         elif game.isPlayerTurn or not game.isPlayerTurn:
-            if click_zone_1.collidepoint(event.pos):
+            if click_zone[0].collidepoint(event.pos):
                 Use_itme(player,0)
                 print("0번 아이템 사용")
-            elif click_zone_2.collidepoint(event.pos):
+            elif click_zone[1].collidepoint(event.pos):
                 Use_itme(player,1)
                 print("1번 아이템 사용")
-            elif click_zone_3.collidepoint(event.pos):
+            elif click_zone[2].collidepoint(event.pos):
                 Use_itme(player,2)
                 print("2번 아이템 사용")
-            elif click_zone_4.collidepoint(event.pos):
+            elif click_zone[3].collidepoint(event.pos):
                 Use_itme(player,3)
                 print("3번 아이템 사용")
             elif click_zone_gun.collidepoint(event.pos):
@@ -155,20 +145,21 @@ while running:
 
             #아드레날린 사용 시 딜러 아이템 사용 가능
             if player.adrenaline:
-                if click_zone_5.collidepoint(event.pos):
+                if click_zone[4].collidepoint(event.pos):
                     Use_itme(dealer,0)
-                    print("dealer 0번 아이템 사용 시도")
-                elif click_zone_6.collidepoint(event.pos):
+                    print("dealer 4번 아이템 사용 시도")
+                elif click_zone[5].collidepoint(event.pos):
                     Use_itme(dealer,1)
-                    print("dealer 1번 아이템 사용 시도")
-                elif click_zone_7.collidepoint(event.pos):
+                    print("dealer 5번 아이템 사용 시도")
+                elif click_zone[6].collidepoint(event.pos):
                     Use_itme(dealer,2)
-                    print("dealer 2번 아이템 사용 시도")
-                elif click_zone_8.collidepoint(event.pos):
+                    print("dealer 6번 아이템 사용 시도")
+                elif click_zone[7].collidepoint(event.pos):
                     Use_itme(dealer,3)
-                    print("dealer 3번 아이템 사용 시도")
+                    print("dealer 7번 아이템 사용 시도")
             
     if not gun.shell:
+        give_item()
         reset_shell()
     
     if player.hp <= 0 or dealer.hp <= 0:
@@ -235,6 +226,8 @@ while running:
             screen.blit(r, rr.topleft)
         else:
             screen.blit(saw_OR_nomal_90 if game.isPlayerTurn else pygame.transform.rotate(saw_OR_nomal_90, 180), (906, 770) if game.isPlayerTurn else (856,-200))
+    elif not gun.shell:
+        screen.blit(image.item_box,(821, 390))
     else:
         screen.blit(saw_OR_nomal_45, gun_pos)
 
@@ -246,6 +239,6 @@ while running:
     screen.blit(image.light, (260, 0))
 
     clock.tick(60)
-    pygame.display.update() # 화면 업데이트
+    pygame.display.update()
 
 pygame.quit()

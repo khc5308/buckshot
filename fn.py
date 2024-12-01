@@ -52,10 +52,12 @@ class img:
         self.heart       = pygame.image.load("./image/heart/heart1.png")
         #탄약   
         self.real        = pygame.image.load("./image/shell/real.png")
-        self.fake        = pygame.image.load("./image/shell/fake.png")
+        self.fake        = pygame.image.load("./image/shell/fake.png")        
         #기타   
         self.light       = pygame.image.load("./image/light.png")
         self.dot         = pygame.image.load("./image/dot.png")
+        self.item_box    = pygame.image.load("./image/item_box.png")
+        self.gift_box    = pygame.image.load("./image/gift_box.png")
         #글자
         self.Text_Dealer = font.render("Dealer", True, (255,255,255))
         self.Text_Player = font.render("Player", True, (255,255,255))
@@ -75,6 +77,21 @@ screen = pygame.display.set_mode((screen_width, screen_height))
 
 item_name=["gift","glasses","phone","sugap","smoke","saw","doll","pill"]
 round = -1
+
+Tmp_width =  image.tmp_img.get_width()
+Tmp_height =  image.tmp_img.get_height()
+click_zone = [pygame.Rect(720, 778, Tmp_width, Tmp_height),
+              pygame.Rect(840, 778, Tmp_width, Tmp_height),
+              pygame.Rect(960, 778, Tmp_width, Tmp_height),
+              pygame.Rect(1080,778, Tmp_width, Tmp_height),
+              pygame.Rect(720, 180, Tmp_width, Tmp_height),
+              pygame.Rect(840, 180, Tmp_width, Tmp_height),
+              pygame.Rect(960, 180, Tmp_width, Tmp_height),
+              pygame.Rect(1080,180, Tmp_width, Tmp_height)
+              ]
+
+
+click_zone_item_box = pygame.Rect(821, 390, image.item_box.get_width(), image.item_box.get_height())
 
 def round_start():
 
@@ -96,6 +113,7 @@ def reset_hp():
     dealer.max_hp = dealer.hp = num_hp
 
 def reset_shell():
+    game.isPlayerTurn = True
     gun.shell = []
 
     # shell 갯수,실탄,공탄 갯수 랜덤 설정
@@ -120,6 +138,40 @@ def reset_shell():
             gun.shell.append(n)
         else:
             gun.shell.append(int(bool(num_real)))
+
+def give_item():
+    a = random.randint(1,2) * 2
+    isClick_itemBox = False
+    while a:
+        for event in pygame.event.get():
+            print("asdf")
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if click_zone_item_box.collidepoint(event.pos):
+                    isClick_itemBox = True
+                    print("isClick_itemBox = True")
+                if isClick_itemBox:
+                    item = item_name[random.randint(0,len(item_name)-1)]
+                    if click_zone[0].collidepoint(event.pos):
+                        print(0)
+                        player.item[0] = item
+                    elif click_zone[1].collidepoint(event.pos):
+                        print(1)
+                        player.item[0] = item
+                    elif click_zone[2].collidepoint(event.pos):
+                        print(2)
+                        player.item[0] = item
+                    elif click_zone[3].collidepoint(event.pos):
+                        print(3)
+                        player.item[0] = item
+                    else:
+                        pass
+
+    for i in range(a):
+        dealer.item[i] = item_name[random.randint(0,len(item_name)-1)]
+                
+                
+
+
 
 def Use_itme(character:Character, slot: int):
     item_name = character.item[slot]
@@ -159,18 +211,21 @@ def doll():
     dealer.expected_shell.pop()
     gun.shell.pop()
 
+#시발
 def gift(character:Character,slot:int):
     if character.Name=='Player':
         character.item[slot] = item_name[2]
     else:
         character.item[slot] = "glasses" #돋보기 선택
 
+#보여주는 방법 구상
 def glasses(character:Character):
     if character.Name=="Player":
         print(gun.shell[-1])
     else:
         character.expected_shell[-1]=gun.shell[-1]#맨 앞 탄환의 실탄여부를 저장
 
+#문제 확인하기
 def jusagi(character:Character,slot:int):
     if character.Name=="Player":
        player.adrenaline = True
@@ -199,6 +254,7 @@ def smoke(character:Character):
     if character.hp > character.max_hp:
         character.hp = character.max_hp
 
+#문제 많음
 def phone(character:Character):
     n = random.randint(2, len(gun.shell)-1)#2부터 총탄 길이까지의 정수인 난수 b
     if character.Name=='player':
