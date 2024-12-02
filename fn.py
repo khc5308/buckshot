@@ -11,6 +11,7 @@ class Character:
         self.hp = 4
         self.issugap = False
         self.adrenaline = False
+        self.pos_hold_item = () 
 
 class Shotgun:
     def __init__(self):
@@ -47,6 +48,7 @@ class img:
         self.saw         = pygame.image.load("./image/item/saw.png")
         self.smoke       = pygame.image.load("./image/item/smoke.png")
         self.tmp_img     = pygame.image.load("./image/item/tmp.png")
+        self.white       = pygame.image.load("./image/item/white.png")
         #하트   
         self.heart_break = pygame.image.load("./image/heart/heart0.png")
         self.heart       = pygame.image.load("./image/heart/heart1.png")
@@ -61,26 +63,24 @@ class img:
         #글자
         self.Text_Dealer = font.render("Dealer", True, (255,255,255))
         self.Text_Player = font.render("Player", True, (255,255,255))
-#endregion
 
-player = Character()
-dealer = Character()
-gun = Shotgun()
-game = GameSetting()
-image = img()
+        self.gun_45_saw = pygame.transform.scale(self.gun_45_saw, (self.gun_45.get_width() ,self.gun_45.get_height()))
+        self.deler_2    = pygame.transform.scale(self.deler_2   , (self.deler_1.get_width() ,self.deler_1.get_height()))
 
-player.Name = "Player"
-dealer.Name = "Dealer"
+class Position:
+    def __init__(self):
+        self.item             = [(720 ,778),(840 ,778),(960 ,778),(1080,778),(720 ,180),(840 ,180),(960 ,180),(1080,180)]
+        self.shell            = [(1113,418),(1113,449),(1113,480),(1113,511),(1113,541),(1113,572),(1113,603),(1113,634)]
+        self.round_dot        = [(1219,543),(1239,543),(1262,543)]
+        self.heart_player     = [(1209,597),(1225,597),(1241,597),(1257,597)]
+        self.heart_dealer     = [(1209,460),(1225,460),(1241,460),(1257,460)]
+        self.dealer           = (780, 0)
 
-screen_width, screen_height = 1920, 1080 
-screen = pygame.display.set_mode((screen_width, screen_height))
+        self.gun              = (625, 180)
 
-item_name=["gift","glasses","phone","sugap","smoke","saw","doll","pill"]
-round = -1
-
-Tmp_width =  image.tmp_img.get_width()
-Tmp_height =  image.tmp_img.get_height()
-click_zone = [pygame.Rect(720, 778, Tmp_width, Tmp_height),
+        Tmp_width =  image.tmp_img.get_width()
+        Tmp_height =  image.tmp_img.get_height()
+        self.click_zone = [pygame.Rect(720, 778, Tmp_width, Tmp_height),
               pygame.Rect(840, 778, Tmp_width, Tmp_height),
               pygame.Rect(960, 778, Tmp_width, Tmp_height),
               pygame.Rect(1080,778, Tmp_width, Tmp_height),
@@ -89,9 +89,48 @@ click_zone = [pygame.Rect(720, 778, Tmp_width, Tmp_height),
               pygame.Rect(960, 180, Tmp_width, Tmp_height),
               pygame.Rect(1080,180, Tmp_width, Tmp_height)
               ]
+        self.click_zone_item_box = pygame.Rect(821, 390, image.item_box.get_width(), image.item_box.get_height())
 
+        self.click_zone_gun = pygame.Rect(625, 180,image.gun_45.get_width(), image.gun_45.get_height())
+        self.click_zone_playerText = pygame.Rect(907,330, image.Text_Dealer.get_width(), image.Text_Dealer.get_height())
+        self.click_zone_dealerText = pygame.Rect(907,680, image.Text_Player.get_width(), image.Text_Player.get_height())
 
-click_zone_item_box = pygame.Rect(821, 390, image.item_box.get_width(), image.item_box.get_height())
+player = Character()
+dealer = Character()
+gun = Shotgun()
+game = GameSetting()
+image = img()
+pos = Position()
+
+player.Name = "Player"
+dealer.Name = "Dealer"
+
+player.pos_hold_item = (908, 967)
+dealer.pos_hold_item = (937, 195)
+#endregion
+
+Items_di= {
+    "doll"    : image.doll,
+    "gift"    : image.gift,   
+    "glasses" : image.glasses,
+    "jusagi"  : image.jusagi, 
+    "phone"   : image.phone,  
+    "pill"    : image.pill,   
+    "saw"     : image.saw,    
+    "smoke"   : image.smoke,
+    "sugap"   : image.white,
+    " "       : image.tmp_img
+}
+items_name = list(Items_di.keys())
+
+screen_width, screen_height = 1920, 1080 
+screen = pygame.display.set_mode((screen_width, screen_height))
+item_name=["gift","glasses","phone","sugap","smoke","saw","doll","pill"]
+round = -1
+
+Tmp_width  = image.tmp_img.get_width()
+Tmp_height = image.tmp_img.get_height()
+
 
 def round_start():
 
@@ -104,6 +143,7 @@ def round_start():
     print("gun.num_real", gun.real_num)
     print("gun.num_fake", gun.fake_num)
     print("gun.shell", gun.shell)
+    print("-"*50)
 
 def reset_hp():
     # hp 뽑기
@@ -140,38 +180,44 @@ def reset_shell():
             gun.shell.append(int(bool(num_real)))
 
 def give_item():
-    a = random.randint(1,2) * 2
+    screen.blit(image.item_box,(821, 390))
+    a = random.randint(1, 4)
+    b = a
     isClick_itemBox = False
     while a:
-        for event in pygame.event.get():
-            print("asdf")
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                if click_zone_item_box.collidepoint(event.pos):
+        for e in pygame.event.get():
+            if e.type == pygame.MOUSEBUTTONDOWN:
+                if pos.click_zone_item_box.collidepoint(e.pos) and not isClick_itemBox: 
                     isClick_itemBox = True
-                    print("isClick_itemBox = True")
+                    item = item_name[random.randint(0, len(item_name) - 1)]
+                    screen.blit(Items_di[item],(821, 390))
+                    print(item)
                 if isClick_itemBox:
-                    item = item_name[random.randint(0,len(item_name)-1)]
-                    if click_zone[0].collidepoint(event.pos):
-                        print(0)
-                        player.item[0] = item
-                    elif click_zone[1].collidepoint(event.pos):
-                        print(1)
-                        player.item[0] = item
-                    elif click_zone[2].collidepoint(event.pos):
-                        print(2)
-                        player.item[0] = item
-                    elif click_zone[3].collidepoint(event.pos):
-                        print(3)
-                        player.item[0] = item
-                    else:
-                        pass
+                    for i in range(4):
+                        if pos.click_zone[i].collidepoint(e.pos):
+                            if player.item[i] == ' ':
+                                player.item[i] = item
+                            elif player.item.count(' '):
+                                break
 
-    for i in range(a):
+                            isClick_itemBox = False
+                            a -= 1
+                            break
+                        
+        screen.blit(image.background, (0, 0))
+        screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
+        screen.blit(image.item_box,(821, 390))
+        if isClick_itemBox:
+            screen.blit(Items_di[item],(900, 490))
+        draw_item()
+        screen.blit(image.light, (260, 0))
+        pygame.display.update()
+
+
+    for i in range(b):
         dealer.item[i] = item_name[random.randint(0,len(item_name)-1)]
+    draw_item()
                 
-                
-
-
 
 def Use_itme(character:Character, slot: int):
     item_name = character.item[slot]
@@ -180,6 +226,19 @@ def Use_itme(character:Character, slot: int):
     print(f"{item_name} 사용 시도")
     #상대 판단
     opponent = dealer if character.Name=='Player' else player
+
+    add_num = 0 if character.Name=='Player' else 4
+    x1,y1 = pos.item[slot+add_num]
+    x2,y2 = character.pos_hold_item
+    linear_function = lambda x: ((y2 - y1) / (x2 - x1)) * (x - x1) + y1
+    move_item = Items_di[item_name] if  character.Name=='Player' else pygame.transform.rotate(Items_di[item_name], 180)
+    print(x1,x2)
+
+    for i in range(x1,x2+1,5):
+        moving_item(linear_function,i,slot,move_item)
+    for i in range(x1,x2+1,-5):
+        moving_item(linear_function,i,slot,move_item)
+
 
     match item_name:
         case "doll":
@@ -206,6 +265,17 @@ def Use_itme(character:Character, slot: int):
         player.adrenaline = False
 
 #region item function
+
+def moving_item(linear_function,i:int,slot:int,move_item):
+    screen.blit(image.background, (0, 0))
+    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
+    screen.blit(image.dot, pos.round_dot[game.round])
+    screen.blit(image.gun_45_saw if gun.saw else image.gun_45, pos.gun)
+    draw_item()
+    screen.blit(image.tmp_img,pos.item[slot])
+    screen.blit(move_item,(i,linear_function(i)))
+    screen.blit(image.light, (260, 0))
+    pygame.display.update()
 
 def doll():
     dealer.expected_shell.pop()
@@ -256,7 +326,10 @@ def smoke(character:Character):
 
 #문제 많음
 def phone(character:Character):
-    n = random.randint(2, len(gun.shell)-1)#2부터 총탄 길이까지의 정수인 난수 b
+    if len(gun.shell) != 1:
+        n = random.randint(2, len(gun.shell))#2부터 총탄 길이까지의 정수인 난수 b
+    else:
+        n = 1
     if character.Name=='player':
         if len(gun.shell) == 1:
             print(f'1번째 탄 - {gun.shell[-1]}')
@@ -267,6 +340,18 @@ def phone(character:Character):
 
 def sugap(opponent:Character):
     opponent.issugap=True#상대 수갑으로 묶기
+
+def draw_item():
+    #player
+    screen.blit(Items_di[player.item[0]], pos.item[0])
+    screen.blit(Items_di[player.item[1]], pos.item[1])
+    screen.blit(Items_di[player.item[2]], pos.item[2])
+    screen.blit(Items_di[player.item[3]], pos.item[3])
+    #dealer
+    screen.blit(Items_di[dealer.item[0]], pos.item[4])
+    screen.blit(Items_di[dealer.item[1]], pos.item[5])
+    screen.blit(Items_di[dealer.item[2]], pos.item[6])
+    screen.blit(Items_di[dealer.item[3]], pos.item[7])
 
 #endregion
 
@@ -323,6 +408,10 @@ def shoot(character: Character):
     #실탄일 시 
     if gun.shell[-1]:
         character.hp -= 1 + int(gun.saw)
+        #사운드
+    else:
+        #사운드 추가
+        pass
 
     #자신을 쏠 때
     if character.Name == ("Player" if turn else "Dealer"):
@@ -334,3 +423,5 @@ def shoot(character: Character):
     gun.saw = False
     gun.shell.pop()
     dealer.expected_shell.pop()
+
+    
