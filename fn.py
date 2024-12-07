@@ -39,6 +39,7 @@ class img:
         self.gun_90      = pygame.image.load("./image/gun/gun90.png")
         self.gun_90_saw  = pygame.image.load("./image/gun/gun90_saw.png")
         #아이템
+        self.cylinder    = pygame.image.load("./image/item/cylinder.png")
         self.doll        = pygame.image.load("./image/item/doll.png")
         self.gift        = pygame.image.load("./image/item/gift.png")
         self.glasses     = pygame.image.load("./image/item/glasses.png")
@@ -47,6 +48,7 @@ class img:
         self.pill        = pygame.image.load("./image/item/pill.png")
         self.saw         = pygame.image.load("./image/item/saw.png")
         self.smoke       = pygame.image.load("./image/item/smoke.png")
+        self.sugap       = pygame.image.load("./image/item/sugap.png")
         self.tmp_img     = pygame.image.load("./image/item/tmp.png")
         self.white       = pygame.image.load("./image/item/white.png")
         #하트   
@@ -75,7 +77,7 @@ class Position:
         self.heart_player     = [(1209,597),(1225,597),(1241,597),(1257,597)]
         self.heart_dealer     = [(1209,460),(1225,460),(1241,460),(1257,460)]
         self.dealer           = (780, 0)
-
+        self.light            = (260, 0)
         self.gun              = (625, 180)
 
         Tmp_width =  image.tmp_img.get_width()
@@ -110,22 +112,22 @@ dealer.pos_hold_item = (937, 195)
 #endregion
 
 Items_di= {
-    "doll"    : image.doll,
-    "gift"    : image.gift,   
-    "glasses" : image.glasses,
-    "jusagi"  : image.jusagi, 
-    "phone"   : image.phone,  
-    "pill"    : image.pill,   
-    "saw"     : image.saw,    
-    "smoke"   : image.smoke,
-    "sugap"   : image.white,
-    " "       : image.tmp_img
+    "cylinder" : image.cylinder,
+    "doll"     : image.doll,
+    "gift"     : image.gift,   
+    "glasses"  : image.glasses,
+    "jusagi"   : image.jusagi, 
+    "phone"    : image.phone,  
+    "pill"     : image.pill,   
+    "saw"      : image.saw,    
+    "smoke"    : image.smoke,
+    "sugap"    : image.sugap,
+    " "        : image.tmp_img
 }
 items_name = list(Items_di.keys())
 
-screen_width, screen_height = 1920, 1080 
-screen = pygame.display.set_mode((screen_width, screen_height))
-item_name=["gift","glasses","phone","sugap","smoke","saw","doll","pill"]
+screen = pygame.display.set_mode((1920, 1080))
+item_name=["gift","glasses","phone","sugap","smoke","saw","doll","pill","cylinder"]
 round = -1
 
 Tmp_width  = image.tmp_img.get_width()
@@ -136,8 +138,8 @@ def round_start():
 
     game.round += 1
 
-    reset_shell()
     reset_hp()
+    reset_shell()
 
     print("gun.total_num", gun.total_num)
     print("gun.num_real", gun.real_num)
@@ -178,6 +180,21 @@ def reset_shell():
             gun.shell.append(n)
         else:
             gun.shell.append(int(bool(num_real)))
+    
+    show_shell()
+
+def show_shell():
+    screen.blit(image.background,(0,0))
+    shell = sorted(gun.shell)
+    print("shell",shell)
+    for i in range(1,gun.total_num+1):
+        print(shell[-i])
+        screen.blit(image.real if shell[-i] else image.fake, pos.shell[i-1])
+    draw_dealer()
+    draw_item()
+    screen.blit(image.light,pos.light)
+    pygame.display.update()
+    time.sleep(2)
 
 def give_item():
     screen.blit(image.item_box,(821, 390))
@@ -210,7 +227,7 @@ def give_item():
         if isClick_itemBox:
             screen.blit(Items_di[item],(900, 490))
         draw_item()
-        screen.blit(image.light, (260, 0))
+        screen.blit(image.light, pos.light)
         pygame.display.update()
 
 
@@ -218,29 +235,41 @@ def give_item():
         dealer.item[i] = item_name[random.randint(0,len(item_name)-1)]
     draw_item()
                 
-
 def Use_itme(character:Character, slot: int):
     item_name = character.item[slot]
     character.item[slot] = " "
 
     print(f"{item_name} 사용 시도")
+
+    if item_name == " ":
+        return
     #상대 판단
     opponent = dealer if character.Name=='Player' else player
 
-    add_num = 0 if character.Name=='Player' else 4
-    x1,y1 = pos.item[slot+add_num]
-    x2,y2 = character.pos_hold_item
+    x1,y1 = pos.item[slot+(0 if character.Name=='Player' else 4)]
+
+    if item_name == "sugap":
+        x2,y2 = opponent.pos_hold_item
+    else:
+        x2,y2 = character.pos_hold_item
+
     linear_function = lambda x: ((y2 - y1) / (x2 - x1)) * (x - x1) + y1
+
     move_item = Items_di[item_name] if  character.Name=='Player' else pygame.transform.rotate(Items_di[item_name], 180)
-    print(x1,x2)
+    draw_heart()
+    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
 
-    for i in range(x1,x2+1,5):
-        moving_item(linear_function,i,slot,move_item)
-    for i in range(x1,x2+1,-5):
-        moving_item(linear_function,i,slot,move_item)
-
+    accle = 10
+    for i in range(x1,x2+1,10):
+        moving_item(i+accle,linear_function,slot,move_item)
+        accle += 10
+    for i in range(x1,x2+1,-10):
+        moving_item(i-accle,linear_function,slot,move_item)
+        accle += 10
 
     match item_name:
+        case "cylinder":
+            cylinder()
         case "doll":
             doll()
         case "gift":
@@ -266,16 +295,23 @@ def Use_itme(character:Character, slot: int):
 
 #region item function
 
-def moving_item(linear_function,i:int,slot:int,move_item):
+def moving_item(i:int,linear_function,slot:int,move_item):
     screen.blit(image.background, (0, 0))
-    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
+    draw_item()
+    draw_dealer()
+    draw_heart()
     screen.blit(image.dot, pos.round_dot[game.round])
     screen.blit(image.gun_45_saw if gun.saw else image.gun_45, pos.gun)
-    draw_item()
     screen.blit(image.tmp_img,pos.item[slot])
+
     screen.blit(move_item,(i,linear_function(i)))
-    screen.blit(image.light, (260, 0))
+    
+    screen.blit(image.light, pos.light)
     pygame.display.update()
+
+def cylinder():
+    toggled_array = [int(not x) for x in gun.shell]
+    gun.shell = toggled_array
 
 def doll():
     dealer.expected_shell.pop()
@@ -288,14 +324,21 @@ def gift(character:Character,slot:int):
     else:
         character.item[slot] = "glasses" #돋보기 선택
 
-#보여주는 방법 구상
 def glasses(character:Character):
     if character.Name=="Player":
-        print(gun.shell[-1])
+        screen.blit(image.background,(0,0))
+        draw_item()
+        draw_dealer()
+        draw_heart()
+        screen.blit(image.real if gun.shell[-1] else image.fake, pos.shell[0])
+        screen.blit(image.gun_45_saw if gun.saw else image.gun_45,pos.gun)
+        screen.blit(image.dot, pos.round_dot[game.round])
+        screen.blit(image.light,pos.light)
+        pygame.display.update()
+        time.sleep(1)
     else:
-        character.expected_shell[-1]=gun.shell[-1]#맨 앞 탄환의 실탄여부를 저장
+        character.expected_shell[-1]=gun.shell[-1] #맨 앞 탄환의 실탄여부를 저장
 
-#문제 확인하기
 def jusagi(character:Character,slot:int):
     if character.Name=="Player":
        player.adrenaline = True
@@ -324,23 +367,21 @@ def smoke(character:Character):
     if character.hp > character.max_hp:
         character.hp = character.max_hp
 
-#문제 많음
 def phone(character:Character):
-    if len(gun.shell) != 1:
-        n = random.randint(2, len(gun.shell))#2부터 총탄 길이까지의 정수인 난수 b
-    else:
-        n = 1
-    if character.Name=='player':
-        if len(gun.shell) == 1:
-            print(f'1번째 탄 - {gun.shell[-1]}')
-        else:
-            print(f'{n}번째 탄 - {gun.shell[-n]}') #플레이어면 b 위치의 총탄 알려주기
+    n = 1 if len(gun.shell) == 1 else random.randint(2, len(gun.shell))
+    print('-'*30)
+    print(character.Name)
+    if character.Name=='Player':
+        print("asdf")
+        screen.blit(font.render(f'1번째 탄 - {gun.shell[-1]}', True, (255,255,255)), (907,330))
+        time.sleep(1)
     else:
         dealer.expected_shell[-n] = gun.shell[-n]#딜러면 b 위치의 총탄을 리스트에 저장
 
 def sugap(opponent:Character):
     opponent.issugap=True#상대 수갑으로 묶기
 
+#endregion
 def draw_item():
     #player
     screen.blit(Items_di[player.item[0]], pos.item[0])
@@ -353,7 +394,15 @@ def draw_item():
     screen.blit(Items_di[dealer.item[2]], pos.item[6])
     screen.blit(Items_di[dealer.item[3]], pos.item[7])
 
-#endregion
+def draw_heart():
+    for i in range(player.max_hp):
+        screen.blit(image.heart if i < player.hp else image.heart_break, pos.heart_player[i])
+
+    for i in range(dealer.max_hp):
+        screen.blit(image.heart if i < dealer.hp else image.heart_break, pos.heart_dealer[i])
+
+def draw_dealer():
+    screen.blit([image.deler_1,image.deler_1,image.deler_2,image.deler_1][game.round],pos.dealer)
 
 def itemDetermine(possibility):
     for i in range(len(dealer.item)):
@@ -404,6 +453,7 @@ def determine():
 
 def shoot(character: Character):
     turn = game.isPlayerTurn
+    opponent = dealer if character.Name=='Player' else player    
 
     #실탄일 시 
     if gun.shell[-1]:
@@ -413,12 +463,21 @@ def shoot(character: Character):
         #사운드 추가
         pass
 
-    #자신을 쏠 때
-    if character.Name == ("Player" if turn else "Dealer"):
-        if gun.shell[-1]:
-            game.isPlayerTurn = int(not turn)
-    else:
+    # if not opponent.issugap:
+    #     if gun.shell[-1]:
+    #         game.isPlayerTurn = int(not turn)
+    #     elif not (gun.shell[-1] and character.Name == ("Player" if turn else "Dealer")):
+    #         game.isPlayerTurn = int(not turn)
+    print("-"*30)
+    print(" opponent.issugap : ",  opponent.issugap )
+    print("gun.shell[-1] : ",gun.shell[-1] )
+    print("turn : ",turn)
+    print("character.name : ",character.Name)
+
+    print(not(gun.shell[-1] and character.Name == ("Player" if turn else "Dealer")))
+    if not opponent.issugap and ( gun.shell[-1] or ( character.Name != ("Player" if turn else "Dealer"))):
         game.isPlayerTurn = int(not turn)
+
 
     gun.saw = False
     gun.shell.pop()

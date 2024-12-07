@@ -1,6 +1,6 @@
 import pygame, time
 pygame.init()
-from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item #함수
+from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item, draw_heart #함수
 from fn import gun, player, dealer, image, game, pos #class
 from fn import screen, item_name
 
@@ -19,13 +19,12 @@ clock = pygame.time.Clock()
 
 screen.blit(image.background, (0, 0))
 screen.blit(image.dot, pos.round_dot[game.round])
-screen.blit(image.light, (260, 0))
-round_start()
+screen.blit(image.light, pos.light)
 give_item()
+round_start()
 
 # 메인 루프
 while running:
-
     screen.blit(image.background, (0, 0))
     screen.blit(image.dot, pos.round_dot[game.round])
 
@@ -46,6 +45,8 @@ while running:
                     player.item[1] = item_name[5]
                     player.item[2] = item_name[6]
                     player.item[3] = item_name[7]
+                case pygame.K_F3:
+                    player.item[0] = item_name[8]
                 case pygame.K_F11:
                     dealer.item[0] = item_name[0]
                     dealer.item[1] = item_name[1]
@@ -59,6 +60,14 @@ while running:
                 case pygame.K_r:
                     game.round += 1
                     game.round %= 3
+                case pygame.K_s:
+                    screen.blit(image.background,(0,0))
+                    for i in range(1,len(gun.shell)+1):
+                        screen.blit(image.real if gun.shell[-i] else image.fake, pos.shell[i])
+                    screen.blit(image.light,pos.light)
+                    pygame.display.update()
+
+                    time.sleep(2)
                 
 
 
@@ -133,18 +142,10 @@ while running:
     #endregion
 
     #region heart, shell, item, dealer 그리기
-    for i in range(player.max_hp):
-        screen.blit(image.heart if i < player.hp else image.heart_break, pos.heart_player[i])
-
-    for i in range(dealer.max_hp):
-        screen.blit(image.heart if i < dealer.hp else image.heart_break, pos.heart_dealer[i])
-
-    for i in range(1,len(gun.shell)+1):
-        screen.blit(image.real if gun.shell[-i] else image.fake, pos.shell[i-1])
-
+    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
+    draw_heart()
     draw_item()
 
-    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
     #endregion
     
     #region 총 애니메이션 및 그리기
@@ -170,8 +171,6 @@ while running:
         else:
             screen.blit(saw_OR_nomal_90 if game.isPlayerTurn else pygame.transform.rotate(saw_OR_nomal_90, 180), (906, 770) if game.isPlayerTurn else (856,-200))
     elif not gun.shell:
-        screen.blit(image.light, (260, 0))
-        pygame.display.update()
         give_item()
     else:
         screen.blit(saw_OR_nomal_45, pos.gun)
@@ -189,7 +188,7 @@ while running:
         move_gun = True
 
     # 배경 그리기
-    screen.blit(image.light, (260, 0))
+    screen.blit(image.light, pos.light)
 
     clock.tick(60)
     pygame.display.update()
