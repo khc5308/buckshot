@@ -1,8 +1,8 @@
 import pygame, time
 pygame.init()
-from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item, draw_heart,game_end #함수
-from fn import gun, player, dealer, image, game, pos #class
-from fn import screen, item_name
+from souse.fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item, draw_heart,draw_dealer ,game_end #함수
+from souse.fn import gun, player, dealer, image, game, pos #class
+from souse.fn import screen, item_name
 
 #region 변수 설정
 
@@ -20,18 +20,13 @@ clock = pygame.time.Clock()
 screen.blit(image.background, (0, 0))
 screen.blit(image.dot, pos.round_dot[game.round])
 screen.blit(image.light, pos.light)
-give_item()
+
 round_start()
 
 # 메인 루프
 while running:
     screen.blit(image.background, (0, 0))
     screen.blit(image.dot, pos.round_dot[game.round])
-
-    if game.round >= 4:
-        game_end("You are Win!!")
-        
-
 
     # 이벤트 get
     for event in pygame.event.get():
@@ -52,6 +47,9 @@ while running:
                     player.item[3] = item_name[7]
                 case pygame.K_F3:
                     player.item[0] = item_name[8]
+                    player.item[1] = " "
+                    player.item[2] = " "
+                    player.item[3] = " "
                 case pygame.K_F11:
                     dealer.item[0] = item_name[0]
                     dealer.item[1] = item_name[1]
@@ -64,7 +62,6 @@ while running:
                     dealer.item[3] = item_name[7]
                 case pygame.K_r:
                     game.round += 1
-                    game.round %= 3
                 case pygame.K_s:
                     screen.blit(image.background,(0,0))
                     for i in range(1,len(gun.shell)+1):
@@ -83,12 +80,10 @@ while running:
         print(event.pos)
         if shoot_ready and not move_gun and game.isPlayerTurn:
             if pos.click_zone_playerText.collidepoint(event.pos):
-                print("Shoot dealer")
                 shoot(dealer)
                 shoot_ready = False
                 move_gun = True
             elif pos.click_zone_dealerText.collidepoint(event.pos):
-                print("Shoot Player")
                 shoot(player)
                 shoot_ready = False
                 move_gun = True
@@ -128,20 +123,18 @@ while running:
                 elif pos.click_zone[7].collidepoint(event.pos):
                     Use_itme(dealer,3)
                     print("dealer 7번 아이템 사용 시도")
-            
+
     if dealer.hp <= 0:
-        print("item_box and round_start")
-        give_item()
         round_start()
         pygame.display.update()
 
     if player.hp <= 0: 
-        game_end("You are Lose..")
+        game_end("You Lose..")
 
     if not game.isPlayerTurn:
         shoot_ready = True
         move_gun = True
-        
+    
 
     #region 총 클릭 시 text 그리기
     if shoot_ready and game.isPlayerTurn:
@@ -150,9 +143,14 @@ while running:
     #endregion
 
     #region heart, shell, item, dealer 그리기
-    screen.blit([image.deler_1,image.deler_1,image.deler_2][game.round],pos.dealer)
+    draw_dealer()
     draw_heart()
     draw_item()
+    
+    # if dealer.issugap:
+    #     screen.blit(image.sugap,(900, 100))
+    # if player.issugap:
+    #     screen.blit(image.sugap,(900, 900))
 
     #endregion
     
