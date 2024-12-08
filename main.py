@@ -1,6 +1,6 @@
 import pygame, time
 pygame.init()
-from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item, draw_heart #함수
+from fn import round_start, Use_itme, shoot, reset_shell, determine, give_item, draw_item, draw_heart,game_end #함수
 from fn import gun, player, dealer, image, game, pos #class
 from fn import screen, item_name
 
@@ -27,6 +27,11 @@ round_start()
 while running:
     screen.blit(image.background, (0, 0))
     screen.blit(image.dot, pos.round_dot[game.round])
+
+    if game.round >= 4:
+        game_end("You are Win!!")
+        
+
 
     # 이벤트 get
     for event in pygame.event.get():
@@ -63,7 +68,7 @@ while running:
                 case pygame.K_s:
                     screen.blit(image.background,(0,0))
                     for i in range(1,len(gun.shell)+1):
-                        screen.blit(image.real if gun.shell[-i] else image.fake, pos.shell[i])
+                        screen.blit(image.real if gun.shell[-i] else image.fake, pos.shell[i-1])
                     screen.blit(image.light,pos.light)
                     pygame.display.update()
 
@@ -124,11 +129,14 @@ while running:
                     Use_itme(dealer,3)
                     print("dealer 7번 아이템 사용 시도")
             
-    if player.hp <= 0 or dealer.hp <= 0:
+    if dealer.hp <= 0:
         print("item_box and round_start")
         give_item()
         round_start()
         pygame.display.update()
+
+    if player.hp <= 0: 
+        game_end("You are Lose..")
 
     if not game.isPlayerTurn:
         shoot_ready = True
