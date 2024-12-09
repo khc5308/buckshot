@@ -147,11 +147,7 @@ while running:
     draw_heart()
     draw_item()
     
-    # if dealer.issugap:
-    #     screen.blit(image.sugap,(900, 100))
-    # if player.issugap:
-    #     screen.blit(image.sugap,(900, 900))
-
+ 
     #endregion
     
     #region 총 애니메이션 및 그리기
@@ -182,16 +178,16 @@ while running:
         screen.blit(saw_OR_nomal_45, pos.gun)
 
 
-    #endregion
-
-    if not gun.shell:
-        reset_shell()
-    
+    #endregion    
 
     if not game.isPlayerTurn and not move_gun:
         shoot([dealer,player][determine()])
         shoot_ready = False
         move_gun = True
+
+
+    if not gun.shell:
+        reset_shell()
 
     # 배경 그리기
     screen.blit(image.light, pos.light)

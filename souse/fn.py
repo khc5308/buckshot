@@ -517,6 +517,9 @@ def shoot(character: Character):
     isnt_self_shot = not (character.Name == ("Player" if turn else "Dealer"))
 
     #사운드, 체력
+
+    if not len(gun.shell):
+        return
     if gun.shell[-1]:
         character.hp -= 1 + int(gun.saw)
         sound = pygame.mixer.Sound('./souse/sound/SHot.WAV')
